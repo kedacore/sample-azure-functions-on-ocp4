@@ -148,7 +148,7 @@ index 8b1da0c..3c96501 100644
        "name": "event",
        "topic": "twitter",
 -      "brokerList": "kafka-cp-kafka-headless.default.svc.cluster.local:9092",
-+      "brokerList": "my-cluster-kafka-brokers.openshift-operators:9092",
++      "brokerList": "my-cluster-kafka-bootstrap.openshift-operators:9092",
        "consumerGroup": "functions",
        "dataType": "binary"
      }
