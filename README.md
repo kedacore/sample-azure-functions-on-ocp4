@@ -18,10 +18,10 @@ In your OpenShift Admin Console UI, head to **Operators**/**OperatorHub** and se
 
 ### Create a KedaController instance
 
-Create your KEDA instance in the OpenShift Admin COnole by creating `KedaController` resource or by applying the following YAML.
+Create your KEDA instance in the OpenShift Admin console by creating `KedaController` resource or by applying the following YAML.
 
 ```yaml
-apiVersion: keda.k8s.io/v1alpha1
+apiVersion: keda.sh/v1alpha1
 kind: KedaController
 metadata:
   name: keda
