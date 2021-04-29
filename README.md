@@ -166,7 +166,7 @@ index 8b1da0c..3c96501 100644
 ### Deploy the function
 
 ```
-func kubernetes deploy --name twitter-function --javascript --registry $DOCKER_HUB_USERNAME 
+func kubernetes deploy --name twitter-function --typescript --registry $DOCKER_HUB_USERNAME 
 ```
 
 Alternatively, you can build and publish the image on your own and provide the --image-name instead of the --registry
