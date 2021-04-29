@@ -4,41 +4,50 @@ The below will walk you through creating a Kafka instance, publishing your funct
 
 ## Prerequisites
 
-- A running OCP4 cluster
+- A running OpenShift 4 cluster
 - `oc` and `kubectl` pointing to that cluster (can be achieved via `oc login` or setting `KUBECONFIG` accordingly)
 - A Dockerhub account and `docker` being logged into that account to be able to push images.
 
 ## Install Keda
 
-Install keda using the `func` CLI:
 
-```console
-$ func kubernetes install --keda-only --namespace keda
-namespace/keda created
-customresourcedefinition.apiextensions.k8s.io/scaledobjects.keda.k8s.io created
-secret/keda-docker-auth created
-serviceaccount/keda created
-clusterrolebinding.rbac.authorization.k8s.io/keda created
-clusterrolebinding.rbac.authorization.k8s.io/keda-hpa-role-binding created
-service/keda created
-deployment.apps/keda created
-apiservice.apiregistration.k8s.io/v1beta1.custom.metrics.k8s.io created
-apiservice.apiregistration.k8s.io/v1beta1.external.metrics.k8s.io created
+### Install the operator itself
+
+Locate and install [KEDA](https://github.com/kedacore/keda-olm-operator#operator-hub-installation) on OperatorHub.io
+In your OpenShift Admin Console UI, head to **Operators**/**OperatorHub** and search for the **KEDA** operator. Install it.
+
+### Create a KedaController instance
+
+Create your KEDA instance in the OpenShift Admin COnole by creating `KedaController` resource or by applying the following YAML.
+
+```yaml
+apiVersion: keda.k8s.io/v1alpha1
+kind: KedaController
+metadata:
+  name: keda
+  namespace: keda
+spec:
+  watchNamespace: ""
+  logLevel: info
+  logEncoder: console
+  logLevelMetrics: "0"
 ```
 
-`oc -n keda get pods` should now show the keda controller being deployed.
+`oc -n keda get pods` should now show the KEDA Operator and Metrics ApiServer being deployed.
 
 ```console
 $ oc -n keda get pods
-NAME                    READY     STATUS    RESTARTS   AGE
-keda-5f5674b499-n6snr   1/1       Running   0          93s
+NAME                                      READY   STATUS    RESTARTS   AGE
+keda-metrics-apiserver-6d749bfb59-ps2dj   1/1     Running   0          3h45m
+keda-olm-operator-b6bd5b88f-gkmmh         1/1     Running   0          3h45m
+keda-operator-59dcf989d6-k8z7p            1/1     Running   0          3h45m
 ```
 
 ## Install Kafka using the Strimzi operator
 
 ### Install the operator itself
 
-Follow the [install instructions for the Strimzi Kafka operator](https://operatorhub.io/operator/stable/strimzi-cluster-operator.v0.11.1) on OperatorHub.io. Alternatively, in your OCP4 UI, head to **Catalog**/**OperatorHub** and search for the **Strimzi Kafka** operator. Install it.
+Follow the [install instructions for the Strimzi Kafka operator](https://operatorhub.io/operator/stable/strimzi-cluster-operator.v0.11.1) on OperatorHub.io. Alternatively, in your OpenShift Admin Console UI, head to **Operators**/**OperatorHub** and search for the **Strimzi Kafka** operator. Install it.
 
 ### Create a Kafka instance
 
@@ -52,7 +61,7 @@ metadata:
   namespace: openshift-operators
 spec:
   kafka:
-    version: 2.1.0
+    version: 2.7.0
     replicas: 3
     listeners:
       plain: {}
@@ -157,7 +166,7 @@ index 8b1da0c..3c96501 100644
 ### Deploy the function
 
 ```
-func kubernetes deploy --name twitter-function --registry $DOCKER_HUB_USERNAME
+func kubernetes deploy --name twitter-function --typescript --registry $DOCKER_HUB_USERNAME 
 ```
 
 Alternatively, you can build and publish the image on your own and provide the --image-name instead of the --registry
